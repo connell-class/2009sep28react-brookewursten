@@ -3,6 +3,10 @@ package com.revature.eval.java.core;
 import java.time.temporal.Temporal;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.LinkedHashSet;
+import java.util.Arrays;
 
 public class EvaluationService {
 
@@ -30,8 +34,19 @@ public class EvaluationService {
 	 * @return
 	 */
 	public String acronym(String phrase) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		
+		phrase = phrase.replaceAll("-", " ");
+		String[] phraseArray = phrase.split(" ");
+		
+		char[] acronArray = new char[phraseArray.length];
+		
+		for(int i=0; i<phraseArray.length;i++ ) {
+			acronArray[i] = phraseArray[i].charAt(0);
+		}
+		
+		String acron = new String(acronArray);
+		
+		return acron.toUpperCase();
 	}
 
 	/**
@@ -84,20 +99,28 @@ public class EvaluationService {
 		}
 
 		public boolean isEquilateral() {
-			// TODO Write an implementation for this method declaration
-			return false;
+			if(this.sideOne == this.sideTwo && this.sideTwo == this.sideThree) {
+				return true;
+			}else {
+				return false;				
+			}
 		}
 
 		public boolean isIsosceles() {
-			// TODO Write an implementation for this method declaration
-			return false;
+			if(this.sideOne == this.sideTwo || this.sideTwo == this.sideThree || this.sideOne == this.sideThree) {
+				return true;
+			}else {
+				return false;				
+			}
 		}
 
 		public boolean isScalene() {
-			// TODO Write an implementation for this method declaration
-			return false;
+			if(this.sideOne != this.sideTwo && this.sideTwo != this.sideThree && this.sideOne != this.sideThree) {
+				return true;
+			}else {
+				return false;				
+			}
 		}
-
 	}
 
 	/**
@@ -115,9 +138,50 @@ public class EvaluationService {
 	 * @param string
 	 * @return
 	 */
+	
+
+//Just a method to get the letter score. There is probably an easier way, but this wasn't bad
+	public int getLetterScore(char c) {
+		if(c=='A'||c=='E'||c=='I'||c=='O'||c=='U'||c=='R'||c=='S'||c=='T'||c=='L'||c=='N') {
+			return 1;				
+		}
+		if(c=='D'||c=='G') {
+			return 2;
+		}
+		if(c=='B'||c=='C'||c=='M'||c=='P') {
+			return 3;
+		}
+		if(c=='F'||c=='H'||c=='V'||c=='W'||c=='Y') {
+			return 4;
+		}
+		if(c=='K') {
+			return 5;
+		}
+		if(c=='J'||c=='X') {
+			return 8;
+		}
+		if(c=='Q'||c=='Z') {
+			return 10;
+		}else {
+			throw new IllegalArgumentException();
+		}
+	}
+	
 	public int getScrabbleScore(String string) {
-		// TODO Write an implementation for this method declaration
-		return 0;
+		
+		string = string.toUpperCase();
+		
+		//Easier to work with a char array
+		char[] charArray = string.toCharArray();
+		
+		
+		int total = 0;//initialize
+		
+		//add up the score using the getLetterScore method
+		for(int i = 0;i<charArray.length;i++) {
+			total += getLetterScore(charArray[i]);
+		}
+		return total;
 	}
 
 	/**
@@ -152,8 +216,18 @@ public class EvaluationService {
 	 * NANP-countries, only 1 is considered a valid country code.
 	 */
 	public String cleanPhoneNumber(String string) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		string = string.replaceAll("[^0-9]", ""); //get rid of anything not a number
+		
+		//Remove country code 1 if present
+		if(string.charAt(0)=='1') {
+			string = string.replaceFirst("1", "");
+		}
+		
+		//Check to make sure it's the right size
+		if(string.length()!=10) {
+			throw new IllegalArgumentException();
+		}
+		return string;
 	}
 
 	/**
@@ -166,8 +240,42 @@ public class EvaluationService {
 	 * @return
 	 */
 	public Map<String, Integer> wordCount(String string) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		
+		//remove upper case and change newlines and commas to single spaces
+		string = string.toLowerCase();
+		string = string.replace("\n", " ");
+		string = string.replace(",", " ");
+		string = string.replace("  ", " ");
+		
+		//change it to a word array
+		String[] wordArray = string.split(" ");
+		
+		//Create an Array without duplicates using a LinkedHashSet
+        LinkedHashSet<String> wordSet = new LinkedHashSet<>( Arrays.asList(wordArray));
+        String[] wordArrayNoDupe = wordSet.toArray(new String[] {});
+
+        
+		//initialize the HashMap and a counting variable
+		Map<String,Integer> wordCount = new HashMap<String,Integer>();
+		Integer count = 0;
+
+		//Check the elements of the Non-dupe array against the full word array
+		for(int i=0;i<wordArrayNoDupe.length;i++) {
+			
+			count=0;
+			
+			for(int j=0; j<wordArray.length; j++) {
+				
+				if(wordArrayNoDupe[i].equals(wordArray[j])) {
+					count++;
+				}
+			}
+			wordCount.put(wordArrayNoDupe[i], count);
+				
+				
+		}
+		
+		return wordCount;
 	}
 
 	/**
