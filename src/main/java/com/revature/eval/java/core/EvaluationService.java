@@ -1,12 +1,18 @@
 package com.revature.eval.java.core;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.Temporal;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.LinkedHashSet;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 public class EvaluationService {
 
@@ -313,12 +319,31 @@ public class EvaluationService {
 	 * binary search is a dichotomic divide and conquer search algorithm.
 	 * 
 	 */
-	static class BinarySearch<T> {
+	@SuppressWarnings("rawtypes")
+	static class BinarySearch<T extends Comparable> {
 		private List<T> sortedList;
 
+		@SuppressWarnings("unchecked")
 		public int indexOf(T t) {
-			// TODO Write an implementation for this method declaration
-			return 0;
+			
+			//initialize index variables
+			int minIndex = 0;
+			int maxIndex = sortedList.size() - 1;
+			int midIndex = (maxIndex + minIndex)/2;
+			
+			//Binary Search
+			while(minIndex<=maxIndex) {
+				if(t.compareTo(sortedList.get(midIndex))==0) {
+					return midIndex;
+				}else if(t.compareTo(sortedList.get(midIndex))>0) {
+					minIndex = midIndex + 1;
+				}else {
+					maxIndex = midIndex - 1;
+				}
+				midIndex = (maxIndex + minIndex)/2;
+			}
+			
+			return -1;
 		}
 
 		public BinarySearch(List<T> sortedList) {
@@ -354,8 +379,35 @@ public class EvaluationService {
 	 * @return
 	 */
 	public String toPigLatin(String string) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		
+		//Initialize Vars and
+		String[] wordArray = string.split(" ");
+		StringBuilder pigLatinPhrase = new StringBuilder();
+
+		//Create a regex pattern to look for vowels
+		Pattern vowel = Pattern.compile("[aeoiu]");
+		
+		for(int i=0; i<wordArray.length;i++) {
+			
+			//find the first vowel
+			Matcher vowelMatcher = vowel.matcher(wordArray[i]);
+			vowelMatcher.find();
+			int firstVowelIndex = vowelMatcher.start();
+			
+			
+			//use the index of the first vowel to construct the piglatin word
+			if(firstVowelIndex == 0) {
+				pigLatinPhrase.append(" " + wordArray[i] + "ay");				
+			}else{
+				if(wordArray[i].charAt(firstVowelIndex - 1) == 'q' ) {//this if statement handles the weird "qu" sound
+					firstVowelIndex++;
+				}
+				pigLatinPhrase.append(" " + wordArray[i].substring(firstVowelIndex)+wordArray[i].substring(0,firstVowelIndex)+"ay");
+			}
+		}
+		
+		pigLatinPhrase.deleteCharAt(0);
+		return pigLatinPhrase.toString();
 	}
 
 	/**
@@ -374,8 +426,34 @@ public class EvaluationService {
 	 * @return
 	 */
 	public boolean isArmstrongNumber(int input) {
-		// TODO Write an implementation for this method declaration
-		return false;
+
+		//Get the String representation of the number
+		Integer integer = input;
+		String inputString = integer.toString();
+		
+		//initialize variables and get number of digits N
+		int armstrong = 0;
+		int N = inputString.length();
+		
+		//Just one digit automatically returns true without wasting time on calculation
+		if(N==1) {
+			return true;
+		}
+		
+		//calculate sum of digits to the power of N
+		for(int i =0; i<inputString.length();i++) {
+			double digit = (double) Double.valueOf(inputString.substring(i,i+1));
+			armstrong += (int) Math.pow(digit,N);
+		}
+		
+		//check the conditions for an armstrong number
+		if(armstrong == input) {
+        	return true;
+        }else {
+        	return false;        	
+        }
+		
+
 	}
 
 	/**
@@ -388,9 +466,31 @@ public class EvaluationService {
 	 * @param l
 	 * @return
 	 */
+	
 	public List<Long> calculatePrimeFactorsOf(long l) {
-		// TODO Write an implementation for this method declaration
-		return null;
+
+		//initialize list
+		List<Long> primeFactors = new ArrayList<Long>();
+		
+		
+		
+		//the highest number we need to check
+		long N = (long) Math.sqrt(Double.valueOf(l));
+		
+		//run the algorithm
+		for(long i=2 ;i <= N;i++) {
+			while(l%i==0) {
+				primeFactors.add(i);
+				l/=i;
+			}
+		}
+		
+		//if we haven't found any primes by sqrt(l), then l must be prime
+		if(primeFactors.size()==0) {
+			primeFactors.add(l);
+		}
+		
+		return primeFactors;
 	}
 
 	/**
@@ -428,8 +528,36 @@ public class EvaluationService {
 		}
 
 		public String rotate(String string) {
-			// TODO Write an implementation for this method declaration
-			return null;
+			
+			//make a character array for messing with ascii codes
+			char[] charArray = string.toCharArray();
+			
+			//make patterns and matchers for upper and lower case separately
+			Pattern upperCase = Pattern.compile("[A-Z]");
+			Matcher ucMatcher = upperCase.matcher(string);
+			Pattern lowerCase = Pattern.compile("[a-z]");
+			Matcher lcMatcher = lowerCase.matcher(string);
+			
+			
+			//rotate uppercase in array using ascii code
+			while(ucMatcher.find()==true) {
+				int i = ucMatcher.start();
+				int ascii = charArray[i];
+				ascii = (ascii-65+key)%26+65;
+				charArray[i] = (char) ascii;
+			}
+			
+			//rotate lowercase in array using ascii code
+			while(lcMatcher.find()==true) {
+				int i = lcMatcher.start();
+				int ascii = charArray[i];
+				ascii = (ascii-97+key)%26+97;
+				charArray[i] = (char) ascii;
+			}
+			
+			//Convert the array to a string to finish
+			string = new String(charArray);
+			return string;
 		}
 
 	}
@@ -447,8 +575,44 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int calculateNthPrime(int i) {
-		// TODO Write an implementation for this method declaration
-		return 0;
+		
+		//Just to pass the last test
+		if(i<1) {
+			throw new IllegalArgumentException();
+		}
+		
+		//initialize variables
+		int count=0;
+		int num = 1;
+		
+		//exit the loop when count = i
+		while(count < i) {
+			num++;
+			
+			//The sqrt scheme does not work with 2 or 3 because j starts at 2
+			if(num == 2 || num == 3) {
+				count++;
+				continue;
+			}
+			
+			//only need to check as high as N=sqrt(num)
+			int N = (int) Math.sqrt(Double.valueOf(num)); 
+
+			//check if num is prime by going through every number 2<j<N
+			for(int j=2;j<=N;j++) {
+				
+				//if not prime, break
+				if(num%j == 0) {
+					break;
+				}
+				
+				//if prime, add it to the count
+				if( j == N) {
+					count++;
+				}
+			}
+		}
+		return num;
 	}
 
 	/**
@@ -484,9 +648,58 @@ public class EvaluationService {
 		 * @return
 		 */
 		public static String encode(String string) {
-			// TODO Write an implementation for this method declaration
-			return null;
+			
+			string = string.replaceAll("[,. ]","");
+			
+			StringBuilder stringb = new StringBuilder();
+
+			//make a character array for messing with ascii codes
+			char[] charArray = string.toCharArray();
+			
+			//make patterns and matchers for upper and lower case separately
+			Pattern pattern = Pattern.compile("[A-Z]");
+			Matcher matcher = pattern.matcher(string);
+			
+			
+			//rotate uppercase in array using ascii code
+			while(matcher.find()==true) {
+				int i = matcher.start();
+				int ascii = charArray[i];
+				ascii = 155 - ascii;
+				charArray[i] = (char) ascii;
+			}
+			
+			matcher.reset();
+			pattern = Pattern.compile("[a-z]");
+			matcher = pattern.matcher(string);
+			
+			//rotate lowercase in array using ascii code
+			while(matcher.find()==true) {
+				int i = matcher.start();
+				int ascii = charArray[i];
+				ascii = 219-ascii;
+				charArray[i] = (char) ascii;
+			}
+			
+			//Convert the array to a string
+			string = new String(charArray).toLowerCase();
+			
+			int i=0;
+			while(i<string.length()) {
+				stringb.append(" ");
+				if(i+5>=string.length()) {
+					stringb.append(string.substring(i));
+				}else {
+					stringb.append(string.substring(i,i+5));
+				}
+				i+=5;
+					
+			}
+			
+			stringb.replace(0, 1, "");
+			return stringb.toString();
 		}
+
 
 		/**
 		 * Question 14
@@ -495,8 +708,11 @@ public class EvaluationService {
 		 * @return
 		 */
 		public static String decode(String string) {
-			// TODO Write an implementation for this method declaration
-			return null;
+			string = AtbashCipher.encode(string);
+			string = string.replace(" ","");
+			
+			
+			return string;
 		}
 	}
 
@@ -523,8 +739,42 @@ public class EvaluationService {
 	 * @return
 	 */
 	public boolean isValidIsbn(String string) {
-		// TODO Write an implementation for this method declaration
-		return false;
+		//remove all the dashes for easier parsing
+		string=string.replace("-", "");
+		
+		//create a pattern and matcher for chars that don't belong
+		Pattern pattern = Pattern.compile("[^0-9X]");
+		Matcher matcher = pattern.matcher(string);
+		
+		//if something doesn't belong return false
+		if(matcher.find()) {return false;}
+		
+		//initialize vars used in the loop
+		int isbn=0;
+		Character character;
+		int val;
+		
+		//run isbn check function
+		for(int i=0,j=10; i<10 && j>0; i++,j--) {
+			character = string.charAt(i);
+			
+			//make sure X counts as 10
+			if(character.equals('X')) {
+				val=10;
+			
+			//make sure everything else counts as it's numerical value
+			}else {
+				val=(int) Integer.valueOf(character)-48;
+			}
+			isbn+= val*j;
+		}
+		
+		//decide whether it's a valid isbn
+		if(isbn%11==0) {
+			return true;
+		}else {
+			return false;
+			}
 	}
 
 	/**
@@ -541,8 +791,19 @@ public class EvaluationService {
 	 * @return
 	 */
 	public boolean isPangram(String string) {
-		// TODO Write an implementation for this method declaration
-		return false;
+		string = string.replace(" ", "");
+		string = string.toLowerCase();
+		
+		char character;
+		boolean containsChar;
+		for(int i =97; i<=122;i++) {
+			character =(char)  i;
+			containsChar = string.contains(Character.toString(character));
+			if(!containsChar) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -554,8 +815,27 @@ public class EvaluationService {
 	 * @return
 	 */
 	public Temporal getGigasecondDate(Temporal given) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		
+		long seconds;
+
+		//get the start date/time in epoch seconds
+		if(given instanceof LocalDateTime) {
+			LocalDateTime dateTime = (LocalDateTime) given;
+			seconds = dateTime.toEpochSecond(ZoneOffset.of("Z"));
+		}else if(given instanceof LocalDate) {
+			LocalDate startDate = (LocalDate) given;
+			long days = startDate.toEpochDay();
+			seconds = days*24*3600;
+		}else {throw new IllegalArgumentException();}
+		
+		
+		//add a billion
+		seconds+= 1000000000;
+		
+		//convert epoch seconds to LocalDateTime
+		LocalDateTime date = LocalDateTime.ofEpochSecond(seconds,0,ZoneOffset.of("Z"));
+		
+		return date;
 	}
 
 	/**
@@ -572,8 +852,23 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int getSumOfMultiples(int i, int[] set) {
-		// TODO Write an implementation for this method declaration
-		return 0;
+		
+		//initialize variables
+		int sum=0;
+		int j = 1;
+		
+		//add j to sum if it's a multiple of a member of set
+		while(j<i) {
+			for(int k : set) {
+				if(j%k==0) {
+					sum+=j;
+					break;  //break out of the second loop to prevent adding duplicates
+				}
+			}
+			j++;
+		}
+		
+		return sum;
 	}
 
 	/**
@@ -613,7 +908,40 @@ public class EvaluationService {
 	 * @return
 	 */
 	public boolean isLuhnValid(String string) {
-		// TODO Write an implementation for this method declaration
+		
+		string = string.replace(" ", "");
+		
+		//check for non-numbers;
+		Pattern notnumber = Pattern.compile("[^0-9]");
+		Matcher matcher = notnumber.matcher(string);
+		if(matcher.find()) {
+			return false;
+		}
+		
+		int N = string.length();
+		int sum=0;
+		char character;
+		
+		for(int i=N-2;i>=0;i-=2) {
+			character = string.charAt(i);			
+			sum += Character.getNumericValue(character);
+		}
+		System.out.println(sum);
+
+		
+		for(int i=N-1;i>=0;i-=2) {
+			character = string.charAt(i);
+			int n = Character.getNumericValue(i);
+			if(2*n > 9) {
+				sum += 2*n-9;
+				continue;
+			}
+			sum += 2*n;
+		}
+		System.out.println(sum);
+		if(sum%10==0) {
+			return true;
+		}
 		return false;
 	}
 
