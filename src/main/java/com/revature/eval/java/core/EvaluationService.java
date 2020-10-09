@@ -7,7 +7,6 @@ import java.time.temporal.Temporal;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.LinkedHashSet;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -909,6 +908,7 @@ public class EvaluationService {
 	 */
 	public boolean isLuhnValid(String string) {
 		
+		//remove spaces
 		string = string.replace(" ", "");
 		
 		//check for non-numbers;
@@ -918,27 +918,29 @@ public class EvaluationService {
 			return false;
 		}
 		
+		//initialize variables
 		int N = string.length();
 		int sum=0;
 		char character;
 		
-		for(int i=N-2;i>=0;i-=2) {
+		//add all the odd digits counting from the right
+		for(int i=N-1;i>=0;i-=2) {
 			character = string.charAt(i);			
 			sum += Character.getNumericValue(character);
 		}
-		System.out.println(sum);
 
-		
-		for(int i=N-1;i>=0;i-=2) {
+		//add all the even digits*2 or digits*2-9 if digits*2>9
+		for(int i=N-2;i>=0;i-=2) {
 			character = string.charAt(i);
-			int n = Character.getNumericValue(i);
+			int n = Character.getNumericValue(character);
 			if(2*n > 9) {
 				sum += 2*n-9;
-				continue;
-			}
+			}else {
 			sum += 2*n;
+			}
 		}
-		System.out.println(sum);
+		
+		//check if it's valid
 		if(sum%10==0) {
 			return true;
 		}
@@ -973,8 +975,33 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int solveWordProblem(String string) {
-		// TODO Write an implementation for this method declaration
-		return 0;
+		
+		//use regex to find the type of probem (+,-,*,/)
+		Pattern operation = Pattern.compile(" plus | minus | multiplied by | divided by ");
+		Matcher typeFinder = operation.matcher(string);
+		typeFinder.find();
+		String type = typeFinder.group();
+
+		//index of start and end of regex string found
+		int start = typeFinder.start();
+		int end = typeFinder.end();
+		
+		//find the numbers by looking for the previous space and the question mark
+		String firstNumberString = string.substring(string.lastIndexOf(" ",start-1)+1,start);
+		String lastNumberString = string.substring(end,string.indexOf("?",end));
+		
+		//perform the operation based on type var
+		switch (type) {
+		case " plus ":
+			return Integer.parseInt(firstNumberString) + Integer.parseInt(lastNumberString);
+		case " minus ":
+			return Integer.parseInt(firstNumberString) - Integer.parseInt(lastNumberString);
+		case " multiplied by ":
+			return Integer.parseInt(firstNumberString) * Integer.parseInt(lastNumberString);
+		case " divided by ":
+			return Integer.parseInt(firstNumberString) / Integer.parseInt(lastNumberString);
+		}
+		throw new IllegalArgumentException();
 	}
 
 }
