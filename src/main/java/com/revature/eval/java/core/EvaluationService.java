@@ -479,7 +479,7 @@ public class EvaluationService {
 		// the highest number we need to check
 		long N = (long) Math.sqrt(Double.valueOf(l));
 
-		// run the algorithm
+		// Algorithm finds the lowest integer that evenly divides l, then removes it
 		for (long i = 2; i <= N; i++) {
 			while (l % i == 0) {
 				primeFactors.add(i);
